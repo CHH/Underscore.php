@@ -1,11 +1,22 @@
 <?php
 
+namespace Underscore;
+
 require "underscore.php";
 
 use Underscore as _;
 
-class UnderscoreTest extends \PHPUnit_Framework_TestCase
+class Test extends \PHPUnit_Framework_TestCase
 {
+    function test()
+    {
+        $value = _c(_\words("foo bar baz"))->map(function($word) {
+            return strtoupper($word);
+        })->value();
+        
+        $this->assertEquals(array("FOO", "BAR", "BAZ"), $value);
+    }    
+    
     function testCamelize()
     {
         $string1 = "foo-bar-baz";
@@ -78,21 +89,12 @@ class UnderscoreTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("Hello World!", $greetAndExclaim("World"));
     }
     
-    function testBlockGiven()
-    {
-        $fn = function($block) {
-            return _\block_given(func_get_args());
-        };
-        
-        $this->assertTrue($fn(function() {}));
-    }
-    
     /**
      * @dataProvider arrayProvider
      */
     function testArrayDeleteKey($array)
     {
-        $value = _\delete_key("foo", $array);
+        $value = _\deleteKey("foo", $array);
         
         $this->assertEquals("bar", $value);
         $this->assertEmpty($array);
@@ -114,7 +116,7 @@ class UnderscoreTest extends \PHPUnit_Framework_TestCase
      */
     function testArrayDeleteAndKeyNotFound($array)
     {
-        $value = _\delete_key("notexistingkey", $array);
+        $value = _\deleteKey("notexistingkey", $array);
         
         $this->assertNull($value);
     }
