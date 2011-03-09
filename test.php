@@ -2,6 +2,8 @@
 
 require "underscore.php";
 
+use Underscore as _;
+
 class UnderscoreTest extends \PHPUnit_Framework_TestCase
 {
     function testCamelize()
@@ -83,15 +85,6 @@ class UnderscoreTest extends \PHPUnit_Framework_TestCase
         };
         
         $this->assertTrue($fn(function() {}));
-    }
-    
-    function testBlockGivenAtOffset()
-    {
-        $fn = function($a, $block, $c) {
-            return _\block_given(func_get_args(), 1);
-        };
-        
-        $this->assertTrue($fn("a", function() {}, "b"));
     }
     
     /**

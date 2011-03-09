@@ -12,7 +12,7 @@
  */
 
 /** @namespace */
-namespace _;
+namespace Underscore;
 
 /**
  * Splits the string on spaces and returns the parts
@@ -153,24 +153,6 @@ function compose()
         }
         return $returnValue;
     };
-}
-
-/**
- * Looks by default at the end of an argument list for a block (Closure)
- *
- * @param  Array $fnArgs Argument list
- * @param  mixed $offset Optional offset if block is not expected on the 
- *                       end of the argument list
- * @return bool
- */
-function block_given(Array $fnArgs, $offset = null)
-{
-    if (null === $offset) {
-        $block = array_pop($fnArgs);
-    } else {
-        $block = $fnArgs[$offset];
-    }
-    return is_callable(array($block, "__invoke"));
 }
 
 /**
