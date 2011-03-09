@@ -76,7 +76,7 @@ function last($array)
 
 function times($number, $callback, array $args = array())
 {
-    for ($i = 0; $i < $number, $i++) {
+    for ($i = 0; $i < $number; $i++) {
         call_user_func_array($callback, $args);
     }
 }
