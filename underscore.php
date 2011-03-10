@@ -14,14 +14,19 @@
 namespace 
 {
     function _c($collection) {
-        return new Underscore\Collection($collection);
+        return Underscore\collection($collection);
     }
 }
 
 /** @namespace */
 namespace Underscore
 {
-
+    /**
+     * Converts the list/array to a collection object 
+     *
+     * @param  object|array $collection
+     * @return Collection
+     */
     function collection($collection)
     {
         return new Collection($collection);
@@ -110,14 +115,14 @@ namespace Underscore
             unset($this->value[$offset]);
         }
     }
-
+    
     function each($list, $iterator)
     {
         foreach ($list as $key => $value) {
             call_user_func($iterator, $value, $key);
         }
     }
-
+    
     function map($list, $iterator)
     {
         $return = array();
@@ -285,7 +290,13 @@ namespace Underscore
         unset($array[$offset]);
         return $value;
     }
-
+    
+    /**
+     * Returns the array without all falsy values
+     *
+     * @param  array $array
+     * @return array
+     */
     function compact($array)
     {
         return array_filter((array) $array);
@@ -294,7 +305,14 @@ namespace Underscore
     function flatten($array)
     {
     }
-
+    
+    /**
+     * Removes a copy of the array with all occurences of $value removed
+     *
+     * @param  array $array
+     * @param  mixed $value
+     * @return array
+     */
     function without($array, $value)
     {
         $return = array();
@@ -306,7 +324,13 @@ namespace Underscore
         }
         return $return;
     }
-
+    
+    /**
+     * Returns a duplicate free version of the array
+     *
+     * @param array $array
+     * @return array
+     */
     function uniq($array)
     {
         return array_unique($array);
@@ -319,25 +343,48 @@ namespace Underscore
         $return = array();
         
     }
-
+    
+    /**
+     * Searches the value in the array and returns its position
+     *
+     * @param  array $array
+     * @param  mixed $value
+     * @return mixed Index of the element or -1 if it was not found
+     */
     function indexOf($array, $value)
     {
         $index = array_search($value, $array);
         return $index ?: -1;
     }
 
+    /**
+     * Returns the intersection of all given arrays
+     *
+     * @see \array_intersect
+     * @return array
+     */
     function intersect(/* $array,... */)
     {
         $arrays = func_get_args();
         return call_user_func_array("array_intersect", $arrays);
     }
 
+    /**
+     * Returns the first element of the array
+     *
+     * @return mixed
+     */
     function first($array)
     {
         $copy = $array;
         return array_shift((array) $copy);
     }
 
+    /**
+     * Returns the last element of the array
+     *
+     * @return mixed
+     */
     function last($array)
     {
         $copy = $array;
@@ -347,14 +394,31 @@ namespace Underscore
     /*
      * Function functions
      */
-
-    function times($number, $callback, array $args = array())
+    
+    /**
+     * Calls a supplied callback {n} times
+     *
+     * @param int $number
+     * @param callback $callback
+     * @param mixed $arg,...
+     */
+    function times($number, $callback/*, $arg,... */)
     {
+        $args = array_slice(func_get_args(), 2);
+        
         for ($i = 0; $i < $number; $i++) {
             call_user_func_array($callback, $args);
         }
     }
-
+    
+    /**
+     * Returns an identity function
+     * 
+     * An identity function is a function which returns it's passed argument unmodified,
+     * which is useful for default loop callbacks
+     * 
+     * @return callback
+     */
     function identity()
     {
         return function($k) { return $k; };
@@ -397,7 +461,7 @@ namespace Underscore
      * @param  mixed    $value,... Arguments for currying the function
      * @return Closure
      */
-    function curry($fn)
+    function curry($fn/*, $arg,... */)
     {
         $curry = array_slice(func_get_args(), 1);
         
@@ -415,7 +479,7 @@ namespace Underscore
      * @param  callback $fn,... Functions to compose
      * @return Closure
      */
-    function compose()
+    function compose(/* $fn,... */)
     {
         $fns = func_get_args();
         
