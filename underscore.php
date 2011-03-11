@@ -116,6 +116,27 @@ namespace Underscore
         }
     }
     
+    /**
+     * Converts the given collection to an array
+     *
+     * @param  mixed Either a plain object or something Traversable
+     * @return array
+     */
+    function toArray($collection)
+    {
+        if (is_array($collection)) {
+            return $collection;
+        }
+    
+        if ($collection instanceof \Traversable) {
+            $array = iterator_to_array($collection);
+            
+        } else if (is_object($collection)) {
+            $array = (array) $collection;
+        }
+        return $array;
+    }
+    
     function each($list, $iterator)
     {
         foreach ($list as $key => $value) {
@@ -299,7 +320,7 @@ namespace Underscore
      */
     function compact($array)
     {
-        return array_filter((array) $array);
+        return array_filter(toArray($array));
     }
 
     function flatten($array)
@@ -333,7 +354,7 @@ namespace Underscore
      */
     function uniq($array)
     {
-        return array_unique($array);
+        return array_unique(toArray($array));
     }
 
     // TODO: Implement Algorithm
@@ -366,6 +387,11 @@ namespace Underscore
     function intersect(/* $array,... */)
     {
         $arrays = func_get_args();
+        
+        foreach ($arrays as &$array) {
+            $array = toArray($array);
+        }
+        
         return call_user_func_array("array_intersect", $arrays);
     }
 
@@ -376,8 +402,7 @@ namespace Underscore
      */
     function first($array)
     {
-        $copy = $array;
-        return array_shift((array) $copy);
+        return array_shift(toArray($array));
     }
 
     /**
@@ -387,8 +412,7 @@ namespace Underscore
      */
     function last($array)
     {
-        $copy = $array;
-        return array_pop((array) $copy);
+        return array_pop(toArray($array));
     }
 
     /*
