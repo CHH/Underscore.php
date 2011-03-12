@@ -252,18 +252,6 @@ namespace Underscore
         return $value;
     }
 
-    function max($list, $iterator = null)
-    {
-    }
-
-    function min($list, $iterator = null)
-    {
-    }
-
-    function sortBy($list, $iterator)
-    {
-    }
-
     function size($list)
     {
         if ($list instanceof \Traversable and !$list instanceof \Countable) {
@@ -334,7 +322,7 @@ namespace Underscore
     }
     
     /**
-     * Removes a copy of the array with all occurences of $value removed
+     * Returns a copy of the array with all occurences of $value removed
      *
      * @param  array $array
      * @param  mixed $value
@@ -344,9 +332,9 @@ namespace Underscore
     {
         $return = array();
         
-        foreach ($array as $v) {
+        foreach ($array as $key => $v) {
             if ($value !== $v) {
-                $return[] = $v;
+                $return[$key] = $v;
             }
         }
         return $return;
@@ -484,6 +472,29 @@ namespace Underscore
         return $wrapped;
     }
 
+    /**
+     * Caches the result of calls with the same arguments
+     *
+     * @param  callback $fn
+     * @return Closure
+     */
+    function memoize($fn, $hashFunction = null)
+    {
+        return function() use ($fn) {
+            static $results = array();
+
+            $args = func_get_args();
+
+            $hash = empty($hashFunction) 
+                ? md5(join($args, ",")) : call_user_func($hashFunction, $args);
+
+            if (empty($results[$hash])) {
+                $results[$hash] = call_user_func_array($fn, $args);
+            }
+            return $results[$hash];
+        };
+    }
+    
     /**
      * Prefills the arguments of a given function
      *
