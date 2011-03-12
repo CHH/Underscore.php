@@ -51,6 +51,12 @@ namespace Underscore
             $this->value = call_user_func_array(__NAMESPACE__ . '\\' . $method, $args);
             return $this;
         }
+
+        function tap($callback)
+        {
+            call_user_func($callback, $this->value);
+            return $this;
+        }
         
         function range($start, $stop, $step = 1)
         {
@@ -167,7 +173,7 @@ namespace Underscore
         }
         return false;
     }
-
+    
     function select($list, $iterator)
     {
         $return = array();
