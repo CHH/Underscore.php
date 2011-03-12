@@ -14,7 +14,7 @@
 namespace 
 {
     function _c($collection) {
-        return Underscore\collection($collection);
+        return Underscore\chain($collection);
     }
 }
 
@@ -27,12 +27,12 @@ namespace Underscore
      * @param  object|array $collection
      * @return Collection
      */
-    function collection($collection)
+    function chain($collection)
     {
-        return new Collection($collection);
+        return new Chain($collection);
     }
 
-    class Collection implements \ArrayAccess, \IteratorAggregate, \Countable
+    class Chain implements \ArrayAccess, \IteratorAggregate, \Countable
     {
         /** @var array */
         protected $value;    
