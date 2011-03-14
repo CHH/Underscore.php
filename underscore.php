@@ -39,19 +39,30 @@ namespace Underscore
         
         function __construct($value = array())
         {
-            if ($value instanceof \Traversable) {
-                $value = iterator_to_array($value);
-            }
-            $this->value = $value;
+            $value = toArray($value);
         }
         
+        /**
+         * Forwards calls to the underscore functions and passes the value
+         * of the wrapped object as first argument
+         *
+         * @param  string $method
+         * @param  array  $args
+         * @return Chain
+         */
         function __call($method, array $args)
         {
             array_unshift($args, $this->value);
             $this->value = call_user_func_array(__NAMESPACE__ . '\\' . $method, $args);
             return $this;
         }
-
+    
+        /**
+         * Calls the callback with the value as argument without interrupting the chain
+         *
+         * @param  callback $callback
+         * @return Chain
+         */
         function tap($callback)
         {
             call_user_func($callback, $this->value);
