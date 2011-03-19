@@ -1,7 +1,7 @@
 <?php
 /**
- * Utility Functions
- * 
+ * Library of Utility Functions in the Spirit of Underscore.js
+ *
  * This source file is subject to the MIT license that is bundled
  * with this package in the file LICENSE.txt.
  *
@@ -11,7 +11,7 @@
  * @license    MIT License
  */
 
-namespace 
+namespace
 {
     function _c($collection) {
         return Underscore\chain($collection);
@@ -22,7 +22,7 @@ namespace
 namespace Underscore
 {
     /**
-     * Converts the list/array to a collection object 
+     * Converts the list/array to a collection object
      *
      * @param  object|array $collection
      * @return Collection
@@ -35,13 +35,13 @@ namespace Underscore
     class Chain implements \ArrayAccess, \IteratorAggregate, \Countable
     {
         /** @var array */
-        protected $value;    
-        
+        protected $value;
+
         function __construct($value = array())
         {
-            $value = toArray($value);
+            $this->value = toArray($value);
         }
-        
+
         /**
          * Forwards calls to the underscore functions and passes the value
          * of the wrapped object as first argument
@@ -56,7 +56,7 @@ namespace Underscore
             $this->value = call_user_func_array(__NAMESPACE__ . '\\' . $method, $args);
             return $this;
         }
-    
+
         /**
          * Calls the callback with the value as argument without interrupting the chain
          *
@@ -68,71 +68,71 @@ namespace Underscore
             call_user_func($callback, $this->value);
             return $this;
         }
-        
+
         function range($start, $stop, $step = 1)
         {
             $this->value = range($start, $stop, $step);
             return $this;
         }
-        
+
         function shift()
         {
             return array_shift($this->value);
         }
-        
+
         function unshift($value)
         {
             array_unshift($this->value, $value);
             return $this;
         }
-        
+
         function pop()
         {
             return array_pop($this->value);
         }
-        
+
         function push($value)
         {
             $this->value[] = $value;
             return $this;
         }
-        
+
         function value()
         {
             return $this->value;
         }
-        
+
         function count()
         {
             return count($this->value);
         }
-        
+
         function getIterator()
         {
             return new ArrayIterator($this->value);
         }
-        
+
         function offsetGet($offset)
         {
             return $this->value[$offset];
         }
-        
+
         function offsetSet($offset, $value)
         {
             $this->value[$offset] = $value;
         }
-        
+
         function offsetExists($offset)
         {
             return isset($this->value[$offset]);
         }
-        
+
         function offsetUnset($offset)
         {
             unset($this->value[$offset]);
         }
     }
-    
+
     /**
      * Converts the given collection to an array
      *
@@ -144,27 +144,27 @@ namespace Underscore
         if (is_array($collection)) {
             return $collection;
         }
-    
+
         if ($collection instanceof \Traversable) {
             $array = iterator_to_array($collection);
-            
+
         } else if (is_object($collection)) {
             $array = (array) $collection;
         }
         return $array;
     }
-    
+
     function each($list, $iterator)
     {
         foreach ($list as $key => $value) {
             call_user_func($iterator, $value, $key);
         }
     }
-    
+
     function map($list, $iterator)
     {
         $return = array();
-        
+
         foreach ($list as $key => $value) {
             $return[$key] = call_user_func($iterator, $value, $key);
         }
@@ -184,11 +184,11 @@ namespace Underscore
         }
         return false;
     }
-    
+
     function select($list, $iterator)
     {
         $return = array();
-        
+
         foreach ($list as $key => $value) {
             if (true === (bool) call_user_func($iterator, $value, $key)) {
                 $return[$key] = $value;
@@ -200,7 +200,7 @@ namespace Underscore
     function reject($list, $iterator)
     {
         $return = array();
-        
+
         foreach ($list as $key => $value) {
             if (true !== (bool) call_user_func($iterator, $value, $key)) {
                 $return[$key] = $value;
@@ -212,7 +212,7 @@ namespace Underscore
     function all($list, $iterator)
     {
         $valid = true;
-        
+
         foreach ($list as $key => $value) {
             $valid = (bool) call_user_func($iterator, $value, $key);
         }
@@ -240,7 +240,7 @@ namespace Underscore
     function invoke($list, $method/*, $arg,... */)
     {
         $args = array_slice(func_get_args(), 2);
-        
+
         foreach ($list as $object) {
             if (is_callable($object, $method)) {
                 call_user_func_array(array($object, $method), $args);
@@ -273,7 +273,7 @@ namespace Underscore
 
     /**
      * Splits the string on spaces and returns the parts
-     * 
+     *
      * @param  string $string
      * @return array
      */
@@ -316,7 +316,7 @@ namespace Underscore
         unset($array[$offset]);
         return $value;
     }
-    
+
     /**
      * Returns the array without all falsy values
      *
@@ -331,7 +331,7 @@ namespace Underscore
     function flatten($array)
     {
     }
-    
+
     /**
      * Returns a copy of the array with all occurences of $value removed
      *
@@ -342,7 +342,7 @@ namespace Underscore
     function without($array, $value)
     {
         $return = array();
-        
+
         foreach ($array as $key => $v) {
             if ($value !== $v) {
                 $return[$key] = $v;
@@ -350,7 +350,7 @@ namespace Underscore
         }
         return $return;
     }
-    
+
     /**
      * Returns a duplicate free version of the array
      *
@@ -367,9 +367,9 @@ namespace Underscore
     {
         $arrays = func_get_args();
         $return = array();
-        
+
     }
-    
+
     /**
      * Searches the value in the array and returns its position
      *
@@ -392,11 +392,11 @@ namespace Underscore
     function intersect(/* $array,... */)
     {
         $arrays = func_get_args();
-        
+
         foreach ($arrays as &$array) {
             $array = toArray($array);
         }
-        
+
         return call_user_func_array("array_intersect", $arrays);
     }
 
@@ -423,7 +423,7 @@ namespace Underscore
     /*
      * Function functions
      */
-    
+
     /**
      * Calls a supplied callback {n} times
      *
@@ -434,18 +434,18 @@ namespace Underscore
     function times($number, $callback/*, $arg,... */)
     {
         $args = array_slice(func_get_args(), 2);
-        
+
         for ($i = 0; $i < $number; $i++) {
             call_user_func_array($callback, $args);
         }
     }
-    
+
     /**
      * Returns an identity function
-     * 
+     *
      * An identity function is a function which returns it's passed argument unmodified,
      * which is useful for default loop callbacks
-     * 
+     *
      * @return callback
      */
     function identity()
@@ -454,32 +454,32 @@ namespace Underscore
     }
 
     /**
-     * Wrap a function in another function and avoid a recursion by passing 
+     * Wrap a function in another function and avoid a recursion by passing
      * the wrapped function as argument to the wrapper
      *
      * @param  callback $fn      The function to wrap
      * @param  callback $wrapper A wrapper function, receives the wrapped function as
-     *                           first argument and the arguments passed to the wrapped 
+     *                           first argument and the arguments passed to the wrapped
      *                           function as subsequent arguments
      * @return Closure
      */
     function wrap($fn, $wrapper)
     {
         // Unify calling of the wrapped function
-        if(is_array($fn) or is_string($fn)) {
+        if (is_array($fn)) {
             $original = function() use ($fn) {
                 return call_user_func_array($fn, func_get_args());
             };
         } else {
             $original = $fn;
         }
-        
+
         $wrapped = function() use ($original, $wrapper) {
             $args = func_get_args();
             array_unshift($args, $original);
             return call_user_func_array($wrapper, $args);
         };
-        
+
         return $wrapped;
     }
 
@@ -496,7 +496,7 @@ namespace Underscore
 
             $args = func_get_args();
 
-            $hash = empty($hashFunction) 
+            $hash = empty($hashFunction)
                 ? md5(join($args, ",")) : call_user_func($hashFunction, $args);
 
             if (empty($results[$hash])) {
@@ -505,7 +505,7 @@ namespace Underscore
             return $results[$hash];
         };
     }
-    
+
     /**
      * Prefills the arguments of a given function
      *
@@ -516,7 +516,7 @@ namespace Underscore
     function curry($fn/*, $arg,... */)
     {
         $curry = array_slice(func_get_args(), 1);
-        
+
         return function() use ($fn, $curry) {
             $args = array_merge($curry, func_get_args());
             return call_user_func_array($fn, $args);
@@ -534,7 +534,7 @@ namespace Underscore
     function compose(/* $fn,... */)
     {
         $fns = func_get_args();
-        
+
         return function() use ($fns) {
             $input = func_get_args();
             foreach ($fns as $fn) {
@@ -548,14 +548,14 @@ namespace Underscore
     /**
      * Calls the Setter Methods in the given object context for every key
      * in the supplied options. The Name of the Setter Method must be camelCased
-     * and the key in the $options Array must have underscores  
+     * and the key in the $options Array must have underscores
      * e.g. for the key "file_name" the Setter's name is "setFileName".
      *
      * @throws InvalidArgumentException If no object is given as context
      *
      * @param  object $context The object context in which the Setters get called
      * @param  array  $options Array containing key => value pairs
-     * @param  array  $settableOptions Optional list of fields which are settable 
+     * @param  array  $settableOptions Optional list of fields which are settable
      *                                on the object
      * @return bool  true if some options have been set in the context, false if no
      *               options were set
@@ -575,7 +575,7 @@ namespace Underscore
 
         foreach ($options as $key => $value) {
 	        $setterName = "set" . camelize($key);
-	
+
 	        if   (!is_callable(array($context, $setterName))) continue;
 	        else $context->{$setterName}($value);
         }
@@ -594,10 +594,11 @@ namespace Underscore
         $string = str_replace(array("-", "_"), " ", $string);
         $string = ucwords($string);
         $string = str_replace(" ", null, $string);
-        
+
         if (!$pascalCase) {
             return lcfirst($string);
         }
         return $string;
     }
 }
+
