@@ -20,7 +20,7 @@ namespace
 
 /** @namespace */
 namespace Underscore
-{
+{   
     /**
      * Converts the list/array to a collection object 
      *
@@ -101,16 +101,28 @@ namespace Underscore
         {
             return $this->value;
         }
-        
+
+        /**
+         * Implement Countable
+         *
+         * @return int
+         */
         function count()
         {
             return count($this->value);
         }
-        
+
+        /**
+         * Implement IteratorAggregate
+         */
         function getIterator()
         {
             return new ArrayIterator($this->value);
         }
+
+        /*
+         * Implement ArrayAccess
+         */
         
         function offsetGet($offset)
         {
@@ -173,6 +185,8 @@ namespace Underscore
 
     function reduce($list, $iterator, $memo)
     {
+        $list = toArray($list);
+        return array_reduce($list, $iterator, $memo);
     }
 
     function detect($list, $iterator)
