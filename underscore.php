@@ -39,7 +39,7 @@ namespace Underscore
         
         function __construct($value = array())
         {
-            $value = toArray($value);
+            $this->value = toArray($value);
         }
         
         /**
