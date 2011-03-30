@@ -6,8 +6,25 @@ require "underscore.php";
 
 use Underscore as _;
 
+class MockMixin extends Mixable
+{
+    function someRealMethod()
+    {}
+}
+
 class Test extends \PHPUnit_Framework_TestCase
 {
+    function testMixable()
+    {
+        $mixable = new MockMixin;
+        $mixable->_extend("greet", function($self, $name) {
+            echo "Hello " . $name;
+        });
+
+        $this->assertTrue($mixable->_respondsTo("greet"));
+        $this->assertTrue($mixable->_respondsTo("someRealMethod"));
+    }
+
     function testChaining()
     {
         $value = _c(array("foo", "bar", "baz"))->map(function($word) {

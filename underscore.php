@@ -146,6 +146,59 @@ namespace Underscore
     }
 
     /**
+     * Small base class for dynamically extendable classes
+     */
+    abstract class Mixable
+    {
+        /** @var array Mixed in methods */
+        private $mixins = array();
+
+        /**
+         * Check if the object responds to the given method
+         *
+         * @param string $method
+         */
+        function _respondsTo($method)
+        {
+            return is_callable(array($this, $method)) or array_key_exists($method, $this->mixins);
+        }
+
+        /**
+         * Add dynamic methods
+         */
+        function _extend($spec, $callable = null)
+        {
+            if (is_array($spec)) {
+                foreach ($spec as $method => $callable) {
+                    $this->_extend($method, $callable);
+                }
+                return $this;
+            }
+
+            if (!is_callable($callable)) {
+                throw new \InvalidArgumentException(sprintf(
+                    "Dynamic methods must be callable, %s given", gettype($callable)
+                ));
+            }
+
+            $this->mixins[$spec] = $callable;
+            return $this;
+        }
+
+        /**
+         * Call the dynamic methods
+         */
+        function __call($method, array $args)
+        {
+            if (empty($this->mixins[$method])) {
+                throw new \BadMethodCallException("Call to undefined method $method");
+            }
+            array_unshift($args, $this);
+            return call_user_func_array($this->mixins[$method], $args);
+        }
+    }
+
+    /**
      * Converts the given collection to an array
      *
      * @param  mixed Either a plain object or something Traversable
