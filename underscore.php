@@ -166,22 +166,23 @@ namespace Underscore
         /**
          * Add dynamic methods
          */
-        function _extend($spec, $callable = null)
+        function _extend(array $spec)
         {
-            if (is_array($spec)) {
-                foreach ($spec as $method => $callable) {
-                    $this->_extend($method, $callable);
-                }
-                return $this;
+            foreach ($spec as $method => $callable) {
+                $this->_def($method, $callable);
             }
+            return $this;
+        }
 
-            if (!is_callable($callable)) {
+        function _def($method, $body)
+        {
+            if (!is_callable($body)) {
                 throw new \InvalidArgumentException(sprintf(
-                    "Dynamic methods must be callable, %s given", gettype($callable)
+                    "Dynamic methods must be callable, %s given", gettype($body)
                 ));
             }
 
-            $this->mixins[$spec] = $callable;
+            $this->mixins[$method] = $body;
             return $this;
         }
 

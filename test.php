@@ -17,7 +17,7 @@ class Test extends \PHPUnit_Framework_TestCase
     function testMixable()
     {
         $mixable = new MockMixin;
-        $mixable->_extend("greet", function($self, $name) {
+        $mixable->_def("greet", function($self, $name) {
             echo "Hello " . $name;
         });
 
