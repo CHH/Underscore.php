@@ -13,6 +13,9 @@
 
 namespace
 {
+    /**
+     * Utility function for creating chains
+     */
     function _c($collection) {
         return Underscore\chain($collection);
     }
@@ -166,10 +169,29 @@ namespace Underscore
         /**
          * Add dynamic methods
          */
-        function _extend(array $spec)
-        {
+        function _extend($spec)
+        {   
+            if (is_string($spec) and class_exists($spec)) {
+                $spec = new $spec;
+            }
+            
+            /**
+             * Copy public instance methods
+             */
+            if (is_object($spec)) {
+                $methods = get_class_methods($spec);
+                
+                foreach ($methods as $method) {
+                    $this->_def($method, array($spec, $method));
+                }
+            }
+        
             foreach ($spec as $method => $callable) {
-                $this->_def($method, $callable);
+                try {
+                    $this->_def($method, $callable);
+                } catch (\InvalidArgumentException $e) {
+                    continue;
+                }
             }
             return $this;
         }
