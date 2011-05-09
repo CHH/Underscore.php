@@ -8,7 +8,7 @@ use Underscore as _;
 
 class Test extends \PHPUnit_Framework_TestCase
 {
-    function testCanDoThingsManyTimes()
+    function testDoesThingsManyTimes()
     {
         $count = 0;
     
