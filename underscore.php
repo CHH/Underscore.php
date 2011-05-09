@@ -11,16 +11,6 @@
  * @license    MIT License
  */
 
-namespace
-{
-    /**
-     * Utility function for creating chains
-     */
-    function _c($collection) {
-        return Underscore\chain($collection);
-    }
-}
-
 /** @namespace */
 namespace Underscore
 {
@@ -35,6 +25,16 @@ namespace Underscore
         return new Chain($collection);
     }
 
+    function from($collection)
+    {
+        return chain($collection);
+    }
+
+    function perform($collection)
+    {
+        return chain($collection);
+    }
+    
     class Chain implements \ArrayAccess, \IteratorAggregate, \Countable
     {
         /** @var array */
@@ -42,7 +42,7 @@ namespace Underscore
 
         function __construct($value = array())
         {
-            $this->value = toArray($value);
+            $this->value = $value;
         }
 
         /**
@@ -149,79 +149,6 @@ namespace Underscore
     }
 
     /**
-     * Small base class for dynamically extendable classes
-     */
-    abstract class Mixable
-    {
-        /** @var array Mixed in methods */
-        private $mixins = array();
-
-        /**
-         * Check if the object responds to the given method
-         *
-         * @param string $method
-         */
-        function _respondsTo($method)
-        {
-            return is_callable(array($this, $method)) or array_key_exists($method, $this->mixins);
-        }
-
-        /**
-         * Add dynamic methods
-         */
-        function _extend($spec)
-        {   
-            if (is_string($spec) and class_exists($spec)) {
-                $spec = new $spec;
-            }
-            
-            /**
-             * Copy public instance methods
-             */
-            if (is_object($spec)) {
-                $methods = get_class_methods($spec);
-                
-                foreach ($methods as $method) {
-                    $this->_def($method, array($spec, $method));
-                }
-            }
-        
-            foreach ($spec as $method => $callable) {
-                try {
-                    $this->_def($method, $callable);
-                } catch (\InvalidArgumentException $e) {
-                    continue;
-                }
-            }
-            return $this;
-        }
-
-        function _def($method, $body)
-        {
-            if (!is_callable($body)) {
-                throw new \InvalidArgumentException(sprintf(
-                    "Dynamic methods must be callable, %s given", gettype($body)
-                ));
-            }
-
-            $this->mixins[$method] = $body;
-            return $this;
-        }
-
-        /**
-         * Call the dynamic methods
-         */
-        function __call($method, array $args)
-        {
-            if (empty($this->mixins[$method])) {
-                throw new \BadMethodCallException("Call to undefined method $method");
-            }
-            array_unshift($args, $this);
-            return call_user_func_array($this->mixins[$method], $args);
-        }
-    }
-
-    /**
      * Converts the given collection to an array
      *
      * @param  mixed Either a plain object or something Traversable
@@ -277,14 +204,7 @@ namespace Underscore
 
     function select($list, $iterator)
     {
-        $return = array();
-
-        foreach ($list as $key => $value) {
-            if (true === (bool) call_user_func($iterator, $value, $key)) {
-                $return[$key] = $value;
-            }
-        }
-        return $return;
+        return array_filter(toArray($list), $iterator);
     }
 
     function reject($list, $iterator)

@@ -6,34 +6,33 @@ require "underscore.php";
 
 use Underscore as _;
 
-class MockMixin extends Mixable
-{
-    function someRealMethod()
-    {}
-}
-
 class Test extends \PHPUnit_Framework_TestCase
 {
-    function testMixable()
+    function testCanDoThingsManyTimes()
     {
-        $mixable = new MockMixin;
-        $mixable->_def("greet", function($self, $name) {
-            echo "Hello " . $name;
+        $count = 0;
+    
+        _\perform(3)->times(function() use (&$count) {
+            $count++;
         });
 
-        $this->assertTrue($mixable->_respondsTo("greet"));
-        $this->assertTrue($mixable->_respondsTo("someRealMethod"));
+        $this->assertEquals(3, $count);
     }
 
-    function testChaining()
+    function testFrom()
     {
-        $value = _c(array("foo", "bar", "baz"))->map(function($word) {
-            return strtoupper($word);
-        })->value();
-
-        $this->assertEquals(array("FOO", "BAR", "BAZ"), $value);
+        $this->assertTrue(_\from(array(1, 2, 3)) instanceof _\Chain);
     }
 
+    function testSelectPreservesKeys()
+    {
+        $result = _\from(array("foo", "bar", "baz"))->select(function($value) {
+            return $value[0] == 'b';
+        });
+
+        $this->assertEquals(array(1 => "bar", 2 => "baz"), $result->value());
+    }
+    
     function testCamelize()
     {
         $string1 = "foo-bar-baz";
@@ -43,16 +42,6 @@ class Test extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expect, _\camelize($string1));
         $this->assertEquals($expect, _\camelize($string2));
-    }
-
-    function testMap()
-    {
-        $data = array("foo", "bar", "baz");
-        $expected = array("FOO", "BAR", "BAZ");
-
-        $mapped = _\map($data, "strtoupper");
-
-        $this->assertEquals($expected, $mapped);
     }
 
     function testIdentity()
