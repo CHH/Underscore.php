@@ -280,14 +280,14 @@ namespace Underscore
         }
         return count($list);
     }
-
+    
     /**
      * Splits the string on spaces and returns the parts
      *
      * @param  string $string
      * @return array
      */
-    function words($string)
+    function w($string)
     {
         return explode(" ", (string) $string);
     }
@@ -450,6 +450,11 @@ namespace Underscore
         }
     }
 
+    /*
+     * Function Functions
+     * ==================
+     */
+    
     /**
      * Returns an identity function
      *
@@ -493,6 +498,49 @@ namespace Underscore
         return $wrapped;
     }
 
+    /**
+     * Allows the supplied function to be called at most once
+     * All subsequent calls will return the first call's return value
+     *
+     * @param  callback $fn
+     * @return mixed
+     */
+    function once($fn)
+    {
+        return function() use ($fn) {
+            static $called = false;
+            static $returnValue;
+
+            if ($called) {
+                return $returnValue;
+            }
+            $called = true;
+            return $returnValue = call_user_func_array($fn, func_get_args());            
+        };
+    }
+
+    /**
+     * Calls the supplied function after $count calls
+     *
+     * @param int $count
+     * @param callback $fn
+     * @return mixed
+     */
+    function after($count, $fn)
+    {
+        return function() use ($count, $fn) {
+            static $calls = 0;
+            static $returnValue;
+
+            $calls++;
+
+            if ($calls == $count) {
+                return $returnValue = call_user_func_array($fn, func_get_args());
+            }
+            return $returnValue;
+        };
+    }
+    
     /**
      * Caches the result of calls with the same arguments
      *

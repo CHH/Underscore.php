@@ -55,11 +55,36 @@ class Test extends \PHPUnit_Framework_TestCase
     function testWordsToArray()
     {
         $string = "apple banana pear plum";
-        $words  = _\words($string);
+        $words  = _\w($string);
 
         $this->assertEquals(4, sizeof($words));
     }
 
+    function testFunctionGetsCalledAfterNumberOfCalls()
+    {
+        $counter = 0;
+        $inc = function() use (&$counter) { 
+            return ++$counter; 
+        };
+
+        $afterThreeInc = _\after(3, $inc);
+
+        _\perform(3)->times($afterThreeInc);
+        $this->assertEquals(1, $counter);
+    }
+    
+    function testFunctionWrappedWithOnceIsCalledOnce()
+    {
+        $called = 0;
+    
+        $fn = _\once(function() use (&$called) {
+            $called++;
+        });
+
+        _\perform(3)->times($fn);
+        $this->assertEquals(1, $called, "Wrapped function was called more than once");
+    }
+    
     function testWrapFunction()
     {
         $arg = "foo";
