@@ -1,0 +1,20 @@
+Underscore\Test\Utility
+ [x] Provides __() shortcut function
+
+Underscore\Test\Function
+ [x] 
+
+Underscore\Test\Array
+ [x] Can pull out the first element of an array
+ [x] Can perform OO-style "first()"
+ [ ] Can pass an index to first
+ [ ] Working rest()
+ [ ] Working rest(0)
+ [x] Can pull out the last element of an array
+ [x] Can trim out all falsy values
+ [ ] Can flatten nested arrays
+ [x] Can remove all instances of an object
+ [x] Uses real object identity for comparisons
+ [x] Can find the unique values of an unsorted array
+ [x] Can find the unique values of an sorted array faster
+
