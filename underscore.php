@@ -11,6 +11,16 @@
  * @license    MIT License
  */
 
+// Define __() Utility function in global Namespace
+namespace {
+    if (!function_exists('__')) {
+        function __($value)
+        {
+            return \Underscore\chain($value);
+        }
+    }
+}
+
 /** @namespace */
 namespace Underscore
 {
@@ -20,19 +30,19 @@ namespace Underscore
      * @param  object|array $collection
      * @return Collection
      */
-    function chain($collection)
+    function chain($value)
     {
-        return new Chain($collection);
+        return new Chain($value);
     }
 
-    function from($collection)
+    function from($value)
     {
-        return chain($collection);
+        return chain($value);
     }
 
-    function perform($collection)
+    function perform($value)
     {
-        return chain($collection);
+        return chain($value);
     }
     
     class Chain implements \ArrayAccess, \IteratorAggregate, \Countable
@@ -340,21 +350,23 @@ namespace Underscore
 
     function flatten($array)
     {
+        return $array;
     }
-
+    
     /**
      * Returns a copy of the array with all occurences of $value removed
      *
      * @param  array $array
-     * @param  mixed $value
+     * @param  mixed $value,...
      * @return array
      */
-    function without($array, $value)
+    function without($array/*, $value,... */)
     {
         $return = array();
+        $values = array_slice(func_get_args(), 1);
 
         foreach ($array as $key => $v) {
-            if ($value !== $v) {
+            if (!in_array($v, $values, true)) {
                 $return[$key] = $v;
             }
         }
@@ -429,7 +441,11 @@ namespace Underscore
     {
         return array_pop(toArray($array));
     }
-
+    
+    function rest($array, $size = null)
+    {
+    }
+    
     /*
      * Function functions
      */
