@@ -21,7 +21,9 @@ class ArrayTest extends \PHPUnit_Framework_TestCase
     
     function testCanPassAnIndexToFirst()
     {
-        $this->assertEquals(array(1, 2), _\first(array(1, 2, 3), 2));
+        $list = array(1, 2, 3);
+        $this->assertEquals(array(), _\first($list, 0));
+        $this->assertEquals(array(1, 2), _\first($list, 2));
     }
     
     /**

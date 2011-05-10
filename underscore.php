@@ -427,9 +427,10 @@ namespace Underscore
      *
      * @return mixed
      */
-    function first($array)
+    function first($array, $length = 1)
     {
-        return array_shift(toArray($array));
+        $array = toArray($array);
+        return $length === 1 ? array_shift($array) : array_slice($array, 0, $length);
     }
 
     /**
@@ -444,6 +445,8 @@ namespace Underscore
     
     function rest($array, $size = null)
     {
+        $array = toArray($array);
+        return array_slice($array, 0 - sizeof($array) - ($size === null ? -1 : $size));
     }
     
     /*
