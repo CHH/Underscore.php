@@ -59,7 +59,7 @@ class ArrayTest extends \PHPUnit_Framework_TestCase
     function testCanFlattenNestedArrays()
     {
         $list = array(1, array(2), array(3, array(array(array(4)))));
-        $this->assertEquals("1, 2, 3, 4", join(_\flatten($list), ", "));
+        $this->assertEquals("1, 2, 3, 4", join(", ", _\flatten($list)));
     }
     
     function testCanRemoveAllInstancesOfAnObject()
@@ -88,5 +88,33 @@ class ArrayTest extends \PHPUnit_Framework_TestCase
     {
         $list = array(1, 1, 1, 2, 2, 3);
         $this->assertEquals("1, 2, 3", join(", ", _\uniq($list, true)));
+    }
+    
+    function testCanTakeTheSetIntersectionOfTwoArrays()
+    {
+        $stooges = array("moe", "curly", "larry");
+        $leaders = array("moe", "groucho");
+        
+        $this->assertEquals("moe", join(", ", _\intersect($stooges, $leaders)));
+    }
+    
+    /**
+     * @testdox Can perform an OO-style intersection
+     */
+    function testCanPerformOOStyleIntersection()
+    {
+        $stooges = array("moe", "curly", "larry");
+        $leaders = array("moe", "groucho");
+        
+        $this->assertEquals("moe", join(", ", _\from($stooges)->intersect($leaders)->value()));
+    }
+    
+    function testIndexOf()
+    {
+        $numbers = array(1, 2, 3);
+        $this->assertEquals(1, _\indexOf($numbers, 2));
+        
+        $this->assertEquals(-1, _\indexOf(null, 2), "Handles NULLs properly");
+        $this->assertEquals(-1, _\indexOf($numbers, 35));
     }
 }

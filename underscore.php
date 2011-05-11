@@ -144,7 +144,10 @@ namespace Underscore
 
         function offsetSet($offset, $value)
         {
-            $this->value[$offset] = $value;
+            if (null === $offset) 
+                $this->push($value);
+            else 
+                $this->value[$offset] = $value;
         }
 
         function offsetExists($offset)
@@ -305,11 +308,11 @@ namespace Underscore
     /**
      * Deletes the given key from the array and returns his value
      *
-     * @param  mixed $key   Key to search for
      * @param  array $array
+     * @param  mixed $key   Key to search for
      * @return mixed Value of the given key, NULL if key was not found in array
      */
-    function deleteKey($key, &$array)
+    function deleteKey(&$array, $key)
     {
         if (!isset($array[$key])) {
             return null;
@@ -323,11 +326,11 @@ namespace Underscore
      * Searches the given value in the array, unsets the found offset
      * and returns the value
      *
-     * @param  mixed $value Value to search for
      * @param  array $array
+     * @param  mixed $value Value to search for
      * @return mixed The value or NULL if the value was not found
      */
-    function delete($value, &$array)
+    function delete(&$array, $value)
     {
         $offset = array_search($value, (array) $array);
         if (false === $offset) {
@@ -379,9 +382,9 @@ namespace Underscore
      * @param array $array
      * @return array
      */
-    function uniq($array)
+    function uniq($array, $sorted = false)
     {
-        return array_unique(toArray($array));
+        return array_unique(toArray($array), $sorted ? false : SORT_REGULAR);
     }
 
     // TODO: Implement Algorithm
@@ -401,6 +404,9 @@ namespace Underscore
      */
     function indexOf($array, $value)
     {
+        if (null === $array)
+            return -1;
+        
         $index = array_search($value, $array);
         return $index ?: -1;
     }
