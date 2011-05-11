@@ -7,9 +7,9 @@ Underscore\Test\Function
 Underscore\Test\Array
  [x] Can pull out the first element of an array
  [x] Can perform OO-style "first()"
- [ ] Can pass an index to first
- [ ] Working rest()
- [ ] Working rest(0)
+ [x] Can pass an index to first
+ [x] Working rest()
+ [x] Working rest(0)
  [x] Can pull out the last element of an array
  [x] Can trim out all falsy values
  [ ] Can flatten nested arrays
@@ -17,4 +17,7 @@ Underscore\Test\Array
  [x] Uses real object identity for comparisons
  [x] Can find the unique values of an unsorted array
  [x] Can find the unique values of an sorted array faster
+ [x] Can take the set intersection of two arrays
+ [x] Can perform an OO-style intersection
+ [x] Index of
 
