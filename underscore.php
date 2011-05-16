@@ -12,7 +12,8 @@
  */
 
 // Define __() Utility function in global Namespace
-namespace {
+namespace 
+{
     if (!function_exists('__')) {
         function __($value)
         {
@@ -24,10 +25,12 @@ namespace {
 /** @namespace */
 namespace Underscore
 {
+    use InvalidArgumentException, ArrayAccess, IteratorAggregate, Countable;
+
     /**
-     * Converts the list/array to a collection object
+     * Returns a chainable represenation of the given value
      *
-     * @param  object|array $collection
+     * @param  mixed $value
      * @return Collection
      */
     function chain($value)
@@ -67,18 +70,6 @@ namespace Underscore
         {
             array_unshift($args, $this->value);
             $this->value = call_user_func_array(__NAMESPACE__ . '\\' . $method, $args);
-            return $this;
-        }
-
-        /**
-         * Calls the callback with the value as argument without interrupting the chain
-         *
-         * @param  callback $callback
-         * @return Chain
-         */
-        function tap($callback)
-        {
-            call_user_func($callback, $this->value);
             return $this;
         }
 
@@ -162,24 +153,23 @@ namespace Underscore
     }
 
     /**
-     * Converts the given collection to an array
+     * Does nothing with the value, only passes it to a callback function
+     * Can be used to inspect chains.
      *
-     * @param  mixed Either a plain object or something Traversable
-     * @return array
+     * @param mixed $value Value to inspect
+     * @param callback $callback
+     * @return mixed The given value
      */
-    function toArray($collection)
+    function tap($value, $callback)
     {
-        if (is_array($collection)) {
-            return $collection;
+        if (!is_callable($callback)) {
+            throw new InvalidArgumentException(sprintf(
+                "%s expects a Callback as second argument, %s given",
+                __FUNCTION__, gettype($callback)
+            ));
         }
-
-        if ($collection instanceof \Traversable) {
-            $array = iterator_to_array($collection);
-
-        } else if (is_object($collection)) {
-            $array = (array) $collection;
-        }
-        return $array;
+        call_user_func($callback, $value);
+        return $value;
     }
 
     function each($list, $iterator)
@@ -201,8 +191,7 @@ namespace Underscore
 
     function reduce($list, $iterator, $memo)
     {
-        $list = toArray($list);
-        return array_reduce($list, $iterator, $memo);
+        return array_reduce((array) $list, $iterator, $memo);
     }
 
     function detect($list, $iterator)
@@ -217,7 +206,7 @@ namespace Underscore
 
     function select($list, $iterator)
     {
-        return array_filter(toArray($list), $iterator);
+        return array_filter((array) $list, $iterator);
     }
 
     function reject($list, $iterator)
@@ -272,6 +261,14 @@ namespace Underscore
         return $list;
     }
 
+    /**
+     * Iterates over the list of objects, reads the given property from each Object
+     * and returns the collected values as list
+     *
+     * @param array $list List of Objects
+     * @param string $property Name of the Object Property
+     * @return array
+     */
     function pluck($list, $property)
     {
         $values = array();
@@ -348,7 +345,7 @@ namespace Underscore
      */
     function compact($array)
     {
-        return array_filter(toArray($array));
+        return array_filter((array) $array);
     }
 
     function flatten($array)
@@ -382,17 +379,14 @@ namespace Underscore
      * @param array $array
      * @return array
      */
-    function uniq($array, $sorted = false)
+    function uniq($list, $sorted = false)
     {
-        return array_unique(toArray($array), $sorted ? false : SORT_REGULAR);
+        return array_unique((array) $list, $sorted ? false : SORT_REGULAR);
     }
 
-    // TODO: Implement Algorithm
     function zip(/* $array,... */)
     {
-        $arrays = func_get_args();
-        $return = array();
-
+        return array();
     }
 
     /**
@@ -407,7 +401,7 @@ namespace Underscore
         if (null === $array)
             return -1;
         
-        $index = array_search($value, $array);
+        $index = array_search($value, (array) $array);
         return $index ?: -1;
     }
 
@@ -419,10 +413,16 @@ namespace Underscore
      */
     function intersect(/* $array,... */)
     {
+        // It may look silly, but call_user_func is still dead slow as of PHP 5.3
+        if (2 === func_num_args()) {
+            list($a1, $a2) = func_get_args();
+            return array_intersect($a1, $a2);
+        }
+
         $arrays = func_get_args();
 
         foreach ($arrays as &$array) {
-            $array = toArray($array);
+            $array = (array) $array;
         }
 
         return call_user_func_array("array_intersect", $arrays);
@@ -433,10 +433,10 @@ namespace Underscore
      *
      * @return mixed
      */
-    function first($array, $length = 1)
+    function first($list, $length = 1)
     {
-        $array = toArray($array);
-        return $length === 1 ? array_shift($array) : array_slice($array, 0, $length);
+        $list = (array) $list;
+        return $length === 1 ? array_shift($list) : array_slice($list, 0, $length);
     }
 
     /**
@@ -444,15 +444,16 @@ namespace Underscore
      *
      * @return mixed
      */
-    function last($array)
+    function last($list)
     {
-        return array_pop(toArray($array));
+        $list = (array) $list;
+        return array_pop($list);
     }
     
-    function rest($array, $size = null)
+    function rest($list, $size = null)
     {
-        $array = toArray($array);
-        return array_slice($array, 0 - sizeof($array) - ($size === null ? -1 : $size));
+        $list = (array) $list;
+        return array_slice($list, 0 - sizeof($list) - ($size === null ? -1 : $size));
     }
     
     /*
@@ -462,17 +463,19 @@ namespace Underscore
     /**
      * Calls a supplied callback {n} times
      *
-     * @param int $number
-     * @param callback $callback
-     * @param mixed $arg,...
+     * @param  int $number
+     * @param  callback $callback
+     * @param  mixed $arg,...
+     * @return mixed Returns the return value of the last call 
      */
     function times($number, $callback/*, $arg,... */)
     {
         $args = array_slice(func_get_args(), 2);
 
         for ($i = 0; $i < $number; $i++) {
-            call_user_func_array($callback, $args);
+            $return = call_user_func_array($callback, $args);
         }
+        return $return;
     }
 
     /*
@@ -574,7 +577,7 @@ namespace Underscore
      */
     function memoize($fn, $hashFunction = null)
     {
-        return function() use ($fn) {
+        return function() use ($fn, $hashFunction) {
             static $results = array();
 
             $args = func_get_args();
@@ -611,6 +614,8 @@ namespace Underscore
      * return value as argument into the next function. The arguments passed to
      * the composed function get passed to the first (most inner) function.
      *
+     * Equals to i(f, g, h) = h(g(f(x)))
+     *
      * @param  callback $fn,... Functions to compose
      * @return Closure
      */
@@ -626,43 +631,6 @@ namespace Underscore
             }
             return $returnValue;
         };
-    }
-
-    /**
-     * Calls the Setter Methods in the given object context for every key
-     * in the supplied options. The Name of the Setter Method must be camelCased
-     * and the key in the $options Array must have underscores
-     * e.g. for the key "file_name" the Setter's name is "setFileName".
-     *
-     * @throws InvalidArgumentException If no object is given as context
-     *
-     * @param  object $context The object context in which the Setters get called
-     * @param  array  $options Array containing key => value pairs
-     * @param  array  $settableOptions Optional list of fields which are settable
-     *                                on the object
-     * @return bool  true if some options have been set in the context, false if no
-     *               options were set
-     */
-    function setOptions($context, array $options, array $defaults = array())
-    {
-        if (!is_object($context)) {
-	        throw new \InvalidArgumentException("Context for setting options is not an Object");
-        }
-        if (!$options) {
-	        return false;
-        }
-
-        if ($defaults) {
-	        $options = array_merge($defaults, $options);
-        }
-
-        foreach ($options as $key => $value) {
-	        $setterName = "set" . camelize($key);
-
-	        if   (!is_callable(array($context, $setterName))) continue;
-	        else $context->{$setterName}($value);
-        }
-        return true;
     }
 
     /**
