@@ -35,7 +35,7 @@ namespace Underscore
      */
     function chain($value)
     {
-        return new Chain($value);
+        return new Wrapper($value);
     }
 
     function from($value)
@@ -48,7 +48,7 @@ namespace Underscore
         return chain($value);
     }
     
-    class Chain implements \ArrayAccess, \IteratorAggregate, \Countable
+    class Wrapper implements \ArrayAccess, \IteratorAggregate, \Countable
     {
         /** @var array */
         protected $value;
@@ -69,7 +69,9 @@ namespace Underscore
         function __call($method, array $args)
         {
             array_unshift($args, $this->value);
-            $this->value = call_user_func_array(__NAMESPACE__ . '\\' . $method, $args);
+            $this->value = call_user_func_array(
+                __NAMESPACE__ . '\\' . $method, $args
+            );
             return $this;
         }
 
@@ -194,6 +196,21 @@ namespace Underscore
         return array_reduce((array) $list, $iterator, $memo);
     }
 
+    /**
+     * @alias detect()
+     */
+    function find($list, $iterator)
+    {
+        return detect($list, $iterator);
+    }
+    
+    /**
+     * Returns the first element which passes a truth test
+     *
+     * @param array $list
+     * @param callback $iterator
+     * @return mixed
+     */
     function detect($list, $iterator)
     {
         foreach ($list as $key => $value) {
@@ -202,6 +219,18 @@ namespace Underscore
             }
         }
         return false;
+    }
+
+    /**
+     * Returns all elements which pass the truth test
+     *
+     * @param array $list
+     * @param callback $iterator
+     * @return array
+     */
+    function filter($list, $iterator)
+    {
+        return select($list, $iterator);
     }
 
     function select($list, $iterator)
@@ -221,6 +250,17 @@ namespace Underscore
         return $return;
     }
 
+    /**
+     * @alias all
+     */
+    function every($list, $iterator) 
+    {
+        return all($list, $iterator);
+    }
+    
+    /**
+     * Returns true if all elements pass a truth test
+     */
     function all($list, $iterator)
     {
         $valid = true;
@@ -290,7 +330,19 @@ namespace Underscore
         }
         return count($list);
     }
-    
+
+    function toArray($iterable)
+    {
+        if (!$iterable) return array();
+
+        if (is_callable(array($iterable, "toArray"))) 
+            return $iterable->toArray();
+
+        if (is_array($iterable)) return $iterable;
+
+        return (array) $iterable;
+    }
+
     /**
      * Splits the string on spaces and returns the parts
      *
@@ -350,7 +402,14 @@ namespace Underscore
 
     function flatten($array)
     {
-        return $array;
+        $result = array();
+        foreach ($array as $key => &$value) {
+            if (is_array($value)) 
+                $result = array_merge($result, flatten($value));
+            else 
+                $result[] = $value;
+        }
+        return $result;
     }
     
     /**
@@ -429,6 +488,14 @@ namespace Underscore
     }
 
     /**
+     * @alias first()
+     */
+    function head($list, $length)
+    {
+        return first($list, $length);
+    }
+
+    /**
      * Returns the first element of the array
      *
      * @return mixed
@@ -449,11 +516,19 @@ namespace Underscore
         $list = (array) $list;
         return array_pop($list);
     }
-    
-    function rest($list, $size = null)
+
+    /**
+     * @alias rest()
+     */
+    function tail($list, $index = null)
+    {
+        return rest($list, $index);
+    }
+
+    function rest($list, $index = null)
     {
         $list = (array) $list;
-        return array_slice($list, 0 - sizeof($list) - ($size === null ? -1 : $size));
+        return array_slice($list, (null === $index ? 1 : $index));
     }
     
     /*

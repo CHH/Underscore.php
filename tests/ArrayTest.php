@@ -59,7 +59,7 @@ class ArrayTest extends \PHPUnit_Framework_TestCase
     function testCanFlattenNestedArrays()
     {
         $list = array(1, array(2), array(3, array(array(array(4)))));
-        $this->assertEquals("1, 2, 3, 4", join(", ", _\flatten($list)));
+        $this->assertEquals("1, 2, 3, 4", join(_\flatten($list), ", "));
     }
     
     function testCanRemoveAllInstancesOfAnObject()
