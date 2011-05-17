@@ -31,6 +31,9 @@ class ChainingTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(10, $counts["e"]);
     }
 
+    /**
+     * @testdox Chaining: select/reject/sortBy
+     */
     function testChainingSelectRejectSortBy()
     {
         $numbers = range(1, 10);
@@ -45,7 +48,10 @@ class ChainingTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals("10, 6, 2", join(', ', $numbers));
     }
 
-    function testReverseConcatUnshiftPopMap()
+    /**
+     * @testdox Chaining: reverse/concat/unshift/pop/map
+     */
+    function testChainingReverseConcatUnshiftPopMap()
     {
         $numbers = range(1, 5);
         $numbers = _\chain($numbers)
@@ -56,6 +62,8 @@ class ChainingTest extends \PHPUnit_Framework_TestCase
             ->map(function($n) { return $n * 2; })
             ->value();
 
-        $this->assertEquals("34, 10, 8, 6, 4, 2, 10, 10", join(', ', $numbers));
+        $this->assertEquals(
+            "34, 10, 8, 6, 4, 2, 10, 10", join(', ', $numbers)
+        );
     }
 }

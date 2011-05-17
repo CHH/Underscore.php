@@ -176,8 +176,9 @@ namespace Underscore
 
     function each($list, $iterator)
     {
+        if (!$list) return;
         foreach ($list as $key => $value) {
-            call_user_func($iterator, $value, $key);
+            call_user_func($iterator, $value, $key, $list);
         }
     }
 
@@ -191,7 +192,12 @@ namespace Underscore
         return $return;
     }
 
-    function reduce($list, $iterator, $memo)
+    function inject($list, $iterator, $memo = 0)
+    {
+        return reduce($list, $iterator, $memo);
+    }
+
+    function reduce($list, $iterator, $memo = 0)
     {
         return array_reduce((array) $list, $iterator, $memo);
     }
@@ -276,7 +282,15 @@ namespace Underscore
         return detect($list, $iterator) ? true : false;
     }
 
+    /**
+     * @alias contains
+     */
     function includes($list, $value)
+    {
+        return contains($list, $value);
+    }
+
+    function contains($list, $value)
     {
         if (is_array($list)) {
             return indexOf($list, $value) ? true : false;
