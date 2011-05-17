@@ -16,7 +16,7 @@ class ArrayTest extends \PHPUnit_Framework_TestCase
      */
     function testCanPerformOOStyleFirst()
     {
-        $this->assertEquals(1, _\from(array(1, 2, 3))->first()->value());
+        $this->assertEquals(1, __(array(1, 2, 3))->first());
     }
     
     function testCanPassAnIndexToFirst()
@@ -106,7 +106,7 @@ class ArrayTest extends \PHPUnit_Framework_TestCase
         $stooges = array("moe", "curly", "larry");
         $leaders = array("moe", "groucho");
         
-        $this->assertEquals("moe", join(", ", _\from($stooges)->intersect($leaders)->value()));
+        $this->assertEquals("moe", join(", ", __($stooges)->intersect($leaders)));
     }
     
     function testIndexOf()

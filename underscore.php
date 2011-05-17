@@ -17,7 +17,7 @@ namespace
     if (!function_exists('__')) {
         function __($value)
         {
-            return \Underscore\chain($value);
+            return new \Underscore\Wrapper($value);
         }
     }
 }
@@ -35,7 +35,7 @@ namespace Underscore
      */
     function chain($value)
     {
-        return new Wrapper($value);
+        return new Wrapper($value, true);
     }
 
     function from($value)
@@ -52,10 +52,12 @@ namespace Underscore
     {
         /** @var array */
         protected $value;
+        protected $chain;
 
-        function __construct($value = array())
+        function __construct($value = array(), $chain = false)
         {
             $this->value = $value;
+            $this->chain = $chain;
         }
 
         /**
@@ -72,7 +74,7 @@ namespace Underscore
             $this->value = call_user_func_array(
                 __NAMESPACE__ . '\\' . $method, $args
             );
-            return $this;
+            return $this->chain ? $this : $this->value;
         }
 
         function range($start, $stop, $step = 1)
@@ -83,7 +85,13 @@ namespace Underscore
 
         function shift()
         {
-            return array_shift($this->value);
+            $value = array_shift($this->value);
+
+            if ($this->chain) {
+                $this->value = $value;
+                return $this;
+            }
+            return $value;
         }
 
         function unshift($value)
@@ -94,12 +102,34 @@ namespace Underscore
 
         function pop()
         {
-            return array_pop($this->value);
+            $value = array_pop($this->value);
+
+            if ($this->chain) {
+                $this->value = $value;
+                return $this;
+            }
+            return $value;
         }
 
         function push($value)
         {
             $this->value[] = $value;
+            return $this;
+        }
+
+        function reverse()
+        {
+            $this->value = array_reverse(toArray($this->value));
+            return $this;
+        }
+
+        function concat()
+        {
+            $result = $this->value ?: array();
+            foreach (func_get_args() as $list) {
+                $result = array_merge($result, $list);
+            }
+            $this->value = $result;
             return $this;
         }
 
@@ -277,6 +307,14 @@ namespace Underscore
         return $valid;
     }
 
+    /**
+     * @alias any()
+     */
+    function some($list, $iterator)
+    {
+        return any($list, $iterator);
+    }
+
     function any($list, $iterator)
     {
         return detect($list, $iterator) ? true : false;
@@ -293,7 +331,7 @@ namespace Underscore
     function contains($list, $value)
     {
         if (is_array($list)) {
-            return indexOf($list, $value) ? true : false;
+            return indexOf($list, $value) >= 0 ? true : false;
         }
         foreach ($list as $value) {
             if ($v === $value) {
