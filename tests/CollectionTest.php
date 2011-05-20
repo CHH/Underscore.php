@@ -15,9 +15,11 @@ class CollectionTest extends \PHPUnit_Framework_TestCase
 
         $answers = array();
         $obj = (object) array("one" => 1, "two" => 2, "three" => 3);
+
         _\each($obj, function($value, $key) use (&$answers) {
             $answers[] = $key;
         });
+
         $this->assertEquals("one, two, three", join(", ", $answers));
 
         $answer = null;
